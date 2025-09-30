@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kata Scoreboard</title>
+
+<style>
+  body {
+    margin: 0;
+    background:linear-gradient(135deg, #001f3f, #013220);
+    font-family: 'Arial Black', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #fff;
+  }
+
+  h1 {
+    color: #CD7F32;
+    font-size: 3rem;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+ p {
+    color: #C0C0C0;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .player-name input {
+    width: 300px;
+    padding: 12px;
+    font-size: 1.5rem;
+    border: 3px solid #fff;
+    background: #0b1a23;
+    color: #fff;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .score-inputs {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .score-inputs input {
+  width: 100px;
+  height: 70px;
+  font-size: 2rem;
+  text-align: center;
+  border: 3px solid #fff;
+  background: linear-gradient(145deg, #ffffff, #e6e6e6);
+  color: #000;
+  border-radius: 12px;
+
+  /* depth */
+  box-shadow: 
+    4px 4px 10px rgba(0,0,0,0.25),
+    -4px -4px 10px rgba(255,255,255,0.4);
+  transition: 0.2s;
+}
+
+.score-inputs input:focus {
+  outline: none;
+  border-color: #d32f2f;
+  background: linear-gradient(145deg, #f8f8f8, #e0e0e0);
+  box-shadow: 
+    inset 3px 3px 6px rgba(0,0,0,0.2),
+    inset -3px -3px 6px rgba(255,255,255,0.4);
+}
+
+.score-inputs input:hover {
+  box-shadow: 
+    6px 6px 12px rgba(0,0,0,0.3),
+    -6px -6px 12px rgba(255,255,255,0.5);
+}
+.belt {
+  display: inline-block;
+  background: #8b0000; /* Default belt color */
+  color: #fff;
+  font-size: 2.2rem;           /* smaller text */
+  font-weight: normal;       /* normal weight */
+  padding: 15px 40px;        /* less height */
+  border-radius: 10px;        /* slightly round corners */
+  box-shadow: inset 0 0 0 3px #fff,
+              0 4px 8px rgba(0,0,0,0.4); /* subtle depth */
+  position: relative;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.belt::before {
+  left: -12px;
+  transform: translateY(-50%);
+}
+
+.belt::after {
+  right: -12px;
+  transform: translateY(-50%);
+}
+
+
+  .error {
+    background: #d32f2f !important;
+    box-shadow: inset 0 0 0 4px #fff, 0 0 10px rgba(255,0,0,0.5) !important;
+  }
+
+  .reset-button {
+    margin-top: 2rem;
+    padding: 12px 24px;
+    background: #d32f2f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  .reset-button:hover {
+    background: #0C0C1E;
+  }
+</style>
+</head>
+<body>
+  <h1>Kata Scoreboard</h1>
+  <p>Universal Shotokan Karate India</p><br>
+  <div class="player-name">
+    <input type="text" id="playerName" placeholder="Player Name">
+  </div>
+  <div class="score-inputs">
+    <input type="number" step="any" placeholder="J 1" required>
+    <input type="number" step="any" placeholder="J 2" required>
+    <input type="number" step="any" placeholder="J 3" required>
+    <input type="number" step="any" placeholder="J 4" required>
+    <input type="number" step="any" placeholder="J 5" required>
+  </div>
+  <div class="result" id="result"></div>
+  <button class="reset-button" onclick="resetScores()">Reset</button>
+
+<script>
+// Automatically convert 2-digit input (except 10) to decimal while typing
+const scoreInputs = document.querySelectorAll('.score-inputs input');
+const resultDiv = document.getElementById('result');
+
+scoreInputs.forEach((input, index) => {
+  input.addEventListener('input', () => {
+    let v = input.value;
+    if (/^\d{2}$/.test(v) && v !== '10') {
+      input.value = v[0] + '.' + v[1]; // 51 → 5.1
+    }
+    calculateIfComplete();
+  });
+
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      if (index < scoreInputs.length - 1) {
+        scoreInputs[index + 1].focus();
+      }
+    }
+  });
+});
+
+function parseScore(value) {
+  return parseFloat(value);
+}
+
+function calculateIfComplete() {
+  let scores = [];
+  for (let input of scoreInputs) {
+    if (input.value === '') {
+      resultDiv.innerHTML = '';
+      return; // wait until all filled
+    }
+    let parsed = parseScore(input.value);
+    if (isNaN(parsed)) {
+      showError('Invalid score entered!');
+      return;
+    }
+    // Must be ≥5 and <10
+    if (parsed < 5 || parsed > 10) {
+      showError('Each score must be between 5 and 10');
+      return;
+    }
+    scores.push(parsed);
+  }
+
+  // If we reach here, all valid
+  scores.sort((a, b) => a - b);
+  scores.shift(); // remove min
+  scores.pop();   // remove max
+  let total = scores.reduce((acc, val) => acc + val, 0);
+
+  const playerName = document.getElementById("playerName").value || "Player";
+  resultDiv.innerHTML = `<div class="belt">${playerName} Final Score: ${total.toFixed(2)}</div>`;
+}
+
+function showError(msg) {
+  resultDiv.innerHTML = `<div class="belt error">⚠️ ${msg}</div>`;
+}
+
+function resetScores() {
+  document.getElementById("playerName").value = "";
+  scoreInputs.forEach(input => (input.value = ""));
+  resultDiv.innerHTML = "";
+  document.getElementById("playerName").focus();
+}
+
+// Auto-focus first input on load
+window.onload = () =>
+  document.getElementById("playerName").focus();
+</script>
+</body>
+</html>
