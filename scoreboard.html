@@ -22,14 +22,15 @@
     color: #CD7F32;
     font-size: 3rem;
     text-transform: uppercase;
-    margin-bottom: 1rem;
+    margin-top: -4rem;
+    margin-bottom: 0.5rem;
     text-align: center;
   }
  p {
     color: #C0C0C0;
     font-size: 1.5rem;
     text-transform: uppercase;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     text-align: center;
   }
 
@@ -49,7 +50,7 @@
     display: flex;
     gap: 12px;
     justify-content: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
 
   .score-inputs input {
@@ -87,7 +88,7 @@
   display: inline-block;
   background: #8b0000; /* Default belt color */
   color: #fff;
-  font-size: 2.2rem;           /* smaller text */
+  font-size: 4rem;           /* smaller text */
   font-weight: normal;       /* normal weight */
   padding: 15px 40px;        /* less height */
   border-radius: 10px;        /* slightly round corners */
@@ -132,6 +133,7 @@
   }
 </style>
 </head>
+
 <body>
   <h1>Kata Scoreboard</h1>
   <p>Universal Shotokan Karate India</p><br>
@@ -203,7 +205,7 @@ function calculateIfComplete() {
   let total = scores.reduce((acc, val) => acc + val, 0);
 
   const playerName = document.getElementById("playerName").value || "Player";
-  resultDiv.innerHTML = `<div class="belt">${playerName} Final Score: ${total.toFixed(2)}</div>`;
+  resultDiv.innerHTML = `<div class="belt">${playerName} Total Score: ${total.toFixed(2)}</div>`;
 }
 
 function showError(msg) {
