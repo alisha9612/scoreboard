@@ -154,6 +154,7 @@
 // Automatically convert 2-digit input (except 10) to decimal while typing
 const scoreInputs = document.querySelectorAll('.score-inputs input');
 const resultDiv = document.getElementById('result');
+const ScoreInput_MAXLEN = 3;
 
 scoreInputs.forEach((input, index) => {
   input.addEventListener('input', () => {
@@ -161,6 +162,13 @@ scoreInputs.forEach((input, index) => {
     if (/^\d{2}$/.test(v) && v !== '10') {
       input.value = v[0] + '.' + v[1]; // 51 → 5.1
     }
+
+    if (input.value.length >= ScoreInput_MAXLEN) {
+      if (index < scoreInputs.length - 1) {
+          scoreInputs[index + 1].focus();
+        }
+      }
+
     calculateIfComplete();
   });
 
